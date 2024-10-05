@@ -1,7 +1,8 @@
 param location string
-// param principalId string
-// param ipAddress string
+param userPrincipalId string
+param userIpAddress string
 param aiServicesName string
+param subnetId string
 param tags object = {}
 
 resource aiServices 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
@@ -14,17 +15,21 @@ resource aiServices 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   kind: 'AIServices'
   properties: {
     customSubDomainName: aiServicesName
-//     apiProperties: {
-//       statisticsEnabled: false
-//     }
-    disableLocalAuth: true // do not support api key authentication
-    publicNetworkAccess: 'Enabled' //(ipAddress != '') ? 'Enabled' : 'Disabled'
-//     networkAcls: (ipAddress != '') ? {
-//       defaultAction: 'Deny'
-//       ipRules: [
-//           {value: ipAddress}
-//       ]
-//     } : null
+    disableLocalAuth: true
+    publicNetworkAccess: (userIpAddress != '') ? 'Enabled' : 'Disabled'
+    networkAcls:  {
+      defaultAction: 'Deny'
+      ipRules: (userIpAddress != '') ? [
+          {
+            value: userIpAddress
+          }
+      ] : []
+      virtualNetworkRules: [
+        {
+          id: subnetId
+        }
+      ]
+    }
   }
 }
 
@@ -39,8 +44,22 @@ resource gptDeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05
     }
   }
   sku: {
-    capacity: 2
+    capacity: 10
     name: 'Standard'
+  }
+}
+
+resource openaiServiceContributorRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  name: 'a001fd3d-188f-4b5d-821b-7da978bf7442'
+}
+
+resource openaiServiceRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(userPrincipalId, aiServices.id, openaiServiceContributorRole.id)
+  scope: aiServices
+  properties: {
+    roleDefinitionId: openaiServiceContributorRole.id
+    principalId: userPrincipalId
+    principalType: 'User'
   }
 }
 

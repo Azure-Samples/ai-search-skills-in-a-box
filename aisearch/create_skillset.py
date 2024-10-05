@@ -19,6 +19,7 @@ load_dotenv()
 search_service_name = os.getenv('SEARCH_SERVICE_NAME')
 search_data_source_connection = os.getenv('SEARCH_DATA_SOURCE_CONNECTION')
 search_container = os.getenv('SEARCH_DATA_SOURCE_CONTAINER')
+web_api_endpoint = 'https://{}/api/classify'.format(os.getenv('WEB_API_URL'))
 
 
 search_endpoint = 'https://{}.search.windows.net'.format(search_service_name)
@@ -42,20 +43,24 @@ class IndexManager:
         self.indexer_client = SearchIndexerClient(endpoint=search_endpoint, credential=credential)
 
     def setup(self):
-        self.__setup_skill_set()
         self.__setup_data_source()
         self.__setup_index()
+        self.__setup_skill_set()
         self.__setup_indexer()
 
     def __setup_skill_set(self):
-        skills = get_config('skills.json')
+        skill_set = get_config('skill_set.json')
+
+        set_custom_skill_url(skill_set['skills'], 'web_api_skill', web_api_endpoint)
+        set_projection_index(skill_set['indexProjections'])
+
         skill_set = SearchIndexerSkillset(
             name=skill_set_name,
-            skills=skills['skills'],
+            skills=skill_set['skills'],
             description='',
             cognitive_services_account=None,
             knowledge_store=None,
-            index_projection=None,
+            index_projection=skill_set['indexProjections'],
             e_tag=None,
             encryption_key=None
         )
@@ -114,6 +119,18 @@ class IndexManager:
             encryption_key=indexer_json.get('encryptionKey'),
         )
         self.indexer_client.create_or_update_indexer(indexer)
+
+
+def set_custom_skill_url(skills: dict, skill_name: str, url: str):
+    for skill in skills:
+        if skill['@odata.type'] == '#Microsoft.Skills.Custom.WebApiSkill' and skill['name'] == skill_name:
+            skill['uri'] = url
+            break
+
+
+def set_projection_index(index_projections: list):
+    for selector in index_projections['selectors']:
+        selector['targetIndexName'] = index_name
 
 
 if __name__ == "__main__":

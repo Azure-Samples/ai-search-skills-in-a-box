@@ -5,18 +5,18 @@ hooks:
   postprovision:
     windows:
       shell: pwsh
-      run: az storage blob upload-batch -d (azd env get-value SEARCH_DATA_SOURCE_CONTAINER) -s ./assets/index_files --account-name (azd env get-value STORAGE_NAME) --auth-mode login 
+      run: ./infra/scripts/postprovision.ps1
     posix:
       shell: sh
-      run: az storage blob upload-batch -d (azd env get-value SEARCH_DATA_SOURCE_CONTAINER) -s ./assets/index_files --account-name (azd env get-value STORAGE_NAME) --auth-mode login 
+      run: ./infra/scripts/postprovision.sh
   predeploy:
     # updates the .env file with the values from the azd environment
     windows:
       shell: pwsh
-      run: azd env get-values > .env && azd env get-values > ./web_api/.env
+      run: ./infra/scripts/predeploy.ps1
     posix:
       shell: sh
-      run: azd env get-values > .env && azd env get-values > ./web_api/.env
+      run: ./infra/scripts/predeploy.sh
 services:
   web_api:
     host: function

@@ -4,6 +4,8 @@ param tags object = {}
 param searchContainerName string
 param deployContainerName string
 param userPrincipalId string
+param subnetId string
+param userIpAddress string
 
 resource storage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageName
@@ -28,7 +30,22 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     }
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
-    publicNetworkAccess: 'enabled'
+    publicNetworkAccess: (userIpAddress != '') ? 'Enabled' : 'Disabled'
+    networkAcls: {
+      defaultAction: 'Deny'
+      ipRules: (userIpAddress != '') ? [
+        {
+          value: userIpAddress
+          action: 'Allow'
+        }
+      ] : []
+      virtualNetworkRules: [
+        {
+          action: 'Allow'
+          id: subnetId
+        }
+      ]
+    }
   }
 }
 
@@ -51,7 +68,7 @@ resource storageBlobDataContributor 'Microsoft.Authorization/roleDefinitions@202
   name: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 }
 
-resource contributorAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource userContributorAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(userPrincipalId, storage.id, storageBlobDataContributor.id)
   scope: storage
   properties: {

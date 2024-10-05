@@ -19,14 +19,15 @@ client = AzureOpenAI(
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT_NAME')
-system_message = '''You are an assistant that needs to classify the user input into a category defined by you
+system_message = '''You are an assistant that needs to classify the user input into the following categories
+- Public
+- Private
+- Unknown
 '''
 
 @app.route(route="classify", methods=['POST'])
 def classify(req: func.HttpRequest) -> func.HttpResponse:
     try:
-        
-        
         payload = req.get_json()
 
         logging.info('Python HTTP trigger function processed a request.')

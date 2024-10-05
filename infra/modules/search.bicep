@@ -1,5 +1,7 @@
 param searchName string
 param storageName string
+param userIpAddress string
+param userPrincipalId string
 param location string
 param tags object = {}
 
@@ -8,7 +10,7 @@ resource search 'Microsoft.Search/searchServices@2024-06-01-preview' = {
   location: location
   tags: tags
   sku: {
-    name: 'standard'
+    name: 'standard2'
   }
   identity: {
     type: 'SystemAssigned'
@@ -17,8 +19,30 @@ resource search 'Microsoft.Search/searchServices@2024-06-01-preview' = {
     disableLocalAuth: true
     hostingMode: 'default'
     partitionCount: 1
-    publicNetworkAccess: 'enabled'
+    publicNetworkAccess: (userIpAddress != '') ? 'Enabled' : 'Disabled'
+    networkRuleSet: {
+      bypass: 'AzureServices'
+      ipRules: (userIpAddress != '') ? [
+        {
+          value: userIpAddress
+        }
+      ] : []
+    }
     replicaCount: 1
+  }
+}
+
+resource searchDataIndexContributor 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  name: '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
+}
+
+resource userContributorAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(userPrincipalId, search.id, searchDataIndexContributor.id)
+  scope: search
+  properties: {
+    roleDefinitionId: searchDataIndexContributor.id
+    principalId: userPrincipalId
+    principalType: 'User'
   }
 }
 
@@ -30,7 +54,7 @@ resource storageBlobDataContributor 'Microsoft.Authorization/roleDefinitions@202
   name: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 }
 
-resource contributorAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource storageContributorAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(search.id, storage.id, storageBlobDataContributor.id)
   scope: storage
   properties: {

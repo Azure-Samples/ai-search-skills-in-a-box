@@ -1,55 +1,19 @@
 {
-    "fieldMappings" : [
-        {
-            "sourceFieldName" : "metadata_storage_path",
-            "targetFieldName" : "metadata_storage_path",
-            "mappingFunction" : { "name" : "base64Encode" }
-        },
+    "fieldMappings": [
         {
             "sourceFieldName": "metadata_storage_name",
-            "targetFieldName": "metadata_storage_name"
+            "targetFieldName": "title"
         }
     ],
-    "outputFieldMappings" :
-    [
-        {
-            "sourceFieldName": "/document/merged_text",
-            "targetFieldName": "content"
-        },
-        {
-            "sourceFieldName" : "/document/normalized_images/*/text",
-            "targetFieldName" : "text"
-        },
-        {
-            "sourceFieldName" : "/document/organizations",
-            "targetFieldName" : "organizations"
-        },
-        {
-            "sourceFieldName": "/document/language",
-            "targetFieldName": "language"
-        },
-        {
-            "sourceFieldName" : "/document/persons",
-            "targetFieldName" : "persons"
-        },
-        {
-            "sourceFieldName" : "/document/locations",
-            "targetFieldName" : "locations"
-        },
-        {
-            "sourceFieldName" : "/document/pages/*/keyPhrases/*",
-            "targetFieldName" : "keyPhrases"
-        }
-    ],
-    "parameters":
-    {
+    "parameters": {
     "batchSize": 1,
     "maxFailedItems":-1,
     "maxFailedItemsPerBatch":-1,
     "configuration":
         {
             "dataToExtract": "contentAndMetadata",
-            "imageAction": "generateNormalizedImages"
+            "imageAction": "generateNormalizedImages",
+            "executionEnvironment": "private"
         }
     }
 }

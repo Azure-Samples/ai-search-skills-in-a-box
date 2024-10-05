@@ -1,4 +1,3 @@
-
 param location string
 param environmentName string
 param servicePlanName string
@@ -7,6 +6,8 @@ param storageName string
 param aiServicesName string
 param deployContainerName string
 param serviceName string
+param subnetId string
+param userIpAddress string
 param tags object = {}
 
 resource storage 'Microsoft.Storage/storageAccounts@2023-04-01' existing = {
@@ -38,6 +39,9 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
     reserved: true
     httpsOnly: true
     serverFarmId: servicePlan.id
+    publicNetworkAccess: (userIpAddress != '') ? 'Enabled' : 'Disabled'
+    virtualNetworkSubnetId: subnetId
+    vnetRouteAllEnabled: false
     functionAppConfig: {
       deployment: {
         storage: {
@@ -68,6 +72,26 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
           value: '~4'
         }
       ]
+      ipSecurityRestrictions: (userIpAddress != '') ? [
+        {
+          action: 'Allow'
+          description: 'my local ip'
+          ipAddress: '${userIpAddress}/32'
+          name: 'myLocalIp'
+          priority: 300
+        }
+      ] : []
+      ipSecurityRestrictionsDefaultAction: 'Deny'
+      scmIpSecurityRestrictions: (userIpAddress != '') ? [
+        {
+          action: 'Allow'
+          description: 'my local ip'
+          ipAddress: '${userIpAddress}/32'
+          name: 'myLocalIp'
+          priority: 300
+        }
+      ] : []
+      scmIpSecurityRestrictionsDefaultAction: 'Deny'
     }
   }
 }
@@ -96,6 +120,7 @@ resource openaiServiceUserRole 'Microsoft.Authorization/roleDefinitions@2022-04-
 
 resource openaiServiceRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(functionApp.id, aiServices.id, openaiServiceUserRole.id)
+  scope: aiServices
   properties: {
     roleDefinitionId: openaiServiceUserRole.id
     principalId: functionApp.identity.principalId
@@ -105,8 +130,4 @@ resource openaiServiceRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' 
 
 output appName string = functionApp.name
 output appPrincipalId string = functionApp.identity.principalId
-
-// output serverFarmName string = serverFarmName
-// output funcAppName string = funcAppName
-// output funAppStorageName string = funAppStorageName
-// output appInsightsName string = appInsightsName
+output appUrl string = functionApp.properties.hostNames[0]

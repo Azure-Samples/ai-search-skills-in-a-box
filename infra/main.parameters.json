@@ -11,16 +11,19 @@
     "location": {
       "value": "${AZURE_LOCATION}"
     },
+    "userIpAddress": {
+      "value": "${IP_ADDRESS}"
+    },
+    "userPrincipalId": {
+      "value": "${AZURE_PRINCIPAL_ID}"
+    },
     "tags": {
       "value": {
         "Owner": "AI Team",
-        "Project": "GPTBot",
+        "Project": "AISearchSkills",
         "Environment": "Dev",
         "Toolkit": "Bicep"
       }
-    },
-    "principalId": {
-      "value": "${AZURE_PRINCIPAL_ID}"
     }
   }
 }
