@@ -2,6 +2,8 @@ param searchName string
 param storageName string
 param userIpAddress string
 param userPrincipalId string
+param appName string
+param searchAppPrivateLinkName string
 param location string
 param tags object = {}
 
@@ -29,6 +31,20 @@ resource search 'Microsoft.Search/searchServices@2024-06-01-preview' = {
       ] : []
     }
     replicaCount: 1
+  }
+}
+
+resource functionApp 'Microsoft.Web/sites@2023-12-01' existing = {
+  name: appName
+}
+
+resource functionAppSharedPrivateLink 'Microsoft.Search/searchServices/sharedPrivateLinkResources@2024-03-01-preview' = {
+  name: searchAppPrivateLinkName
+  parent: search
+  properties: {
+    groupId: 'sites'
+    privateLinkResourceId: functionApp.id
+    requestMessage: 'search needs access to functionapp'
   }
 }
 
@@ -67,4 +83,4 @@ resource storageContributorAccess 'Microsoft.Authorization/roleAssignments@2022-
 output searchID string = search.id
 output searchName string = search.name
 output searchPrincipalId string = search.identity.principalId
-
+output searchAppSharedPrivateLinkName string = functionAppSharedPrivateLink.name

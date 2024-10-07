@@ -34,6 +34,8 @@ var names = {
   searchAppPrivateLinkName: '${abbrs.networkPrivateLinkServices}${environmentName}-${uniqueSuffix}'
   aiServicesName: !empty(aiServicesName) ? aiServicesName : '${abbrs.cognitiveServicesAzureAI}${environmentName}-${uniqueSuffix}'
   vnetName: '${abbrs.networkVirtualNetworks}${environmentName}-${uniqueSuffix}'
+  appName: '${abbrs.webSitesAppService}${environmentName}-${uniqueSuffix}' 
+  servicePlanName: '${abbrs.webServerFarms}${environmentName}-${uniqueSuffix}' 
   storage: !empty(storageName)
     ? storageName
     : take(replace(replace('${abbrs.storageStorageAccounts}${environmentName}${uniqueSuffix}', '-', ''), '_', ''), 24)
@@ -43,7 +45,6 @@ var searchContainer = 'search-container'
 var deployContainer = 'deploy-container'
 var serviceName = 'web_api'
 
-// 1. Create resource group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   name: names.resourceGroupName
   location: location
@@ -88,29 +89,14 @@ module m_storage 'modules/storage.bicep' = {
   }
 }
 
-// 4. Setup search
-module m_search 'modules/search.bicep' = {
-  name: 'deploy_search'
-  scope: resourceGroup
-  params: {
-    searchName: names.search
-    storageName: m_storage.outputs.storageName
-    location: location
-    userIpAddress: userIpAddress
-    userPrincipalId: userPrincipalId
-    tags: tags
-  }
-}
-
-// 5. Setup web api
 module m_web_api 'modules/functionapp.bicep' = {
   name: 'deploy_web_api'
   scope: resourceGroup
   params: {
     location: location
     environmentName: environmentName
-    servicePlanName: '${m_search.outputs.searchName}-service-plan'
-    appName: '${m_search.outputs.searchName}-app'
+    servicePlanName: names.servicePlanName
+    appName: names.appName
     storageName: m_storage.outputs.storageName
     aiServicesName: m_aiservices.outputs.aiServicesName
     deployContainerName: deployContainer
@@ -121,14 +107,18 @@ module m_web_api 'modules/functionapp.bicep' = {
   }
 }
 
-// 5. Setup network
-module m_network 'modules/network.bicep' = {
-  name: 'deploy_networking'
+module m_search 'modules/search.bicep' = {
+  name: 'deploy_search'
   scope: resourceGroup
   params: {
-    searchName: m_search.outputs.searchName
-    appName: m_web_api.outputs.appName
+    searchName: names.search
+    storageName: m_storage.outputs.storageName
+    location: location
+    userIpAddress: userIpAddress
+    userPrincipalId: userPrincipalId
     searchAppPrivateLinkName: names.searchAppPrivateLinkName
+    appName: names.appName
+    tags: tags
   }
 }
 
@@ -141,4 +131,4 @@ output AZURE_OPENAI_CHAT_DEPLOYMENT_NAME string = m_aiservices.outputs.deploymen
 output AZURE_OPENAI_ENDPOINT string = m_aiservices.outputs.endpoint
 output WEB_API_URL string = m_web_api.outputs.appUrl
 output WEB_API_NAME string = m_web_api.outputs.appName
-output SEARCH_APP_SHARED_PRIVATE_LINK_NAME string = m_network.outputs.searchAppSharedPrivateLinkName
+output SEARCH_APP_SHARED_PRIVATE_LINK_NAME string = m_search.outputs.searchAppSharedPrivateLinkName
