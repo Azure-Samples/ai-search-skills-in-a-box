@@ -14,7 +14,7 @@
 |This solution is part of the the AI-in-a-Box framework developed by the team of Microsoft Customer Engineers and Architects to accelerate the deployment of AI and ML solutions. Our goal is to simplify the adoption of AI technologies by providing ready-to-use accelerators that ensure quality, efficiency, and rapid deployment.| <img src="./media/ai-in-a-box.png" alt="AI-in-a-box Logo: Description" style="width: 70%"> |
 
 ## User Story
-
+<FRANKLIN - TODO>
 This is the WHY
 
 Insert a image here that tells an interesting story about the solution being delivered
@@ -29,18 +29,32 @@ Describe what makes this solution and other reasons why someone would want to de
 - **Competitive Edge**: How does it give users a competitive advantage in their domain?
 
 ## What's in the Box
+<img src="./architecture/ai_search_custom_skill_architecture.png" />
 
-This is WHAT they get when they deploy the solution
-
-Describe any helpful technical benefits of this solution (for example, deploys key vault for storing keys securely, UAMI for easy and secure integration)
-
-Describe what Azure Resources are deployed
-
-Include Architecture Diagrams including inputs and outputs
-
-Provide links to any associated blogs about this solution (any FTA blogs you wrote that provide more details)
+- Deployment templates of all resources needed, which includes:
+  - [Azure Function App](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview)
+  - [OpenAI Service and Deployment](https://azure.microsoft.com/en-us/products/ai-services/openai-service)
+  - [Azure Storage](https://learn.microsoft.com/en-us/azure/storage/common/storage-introduction)
+  - [AI Search](https://learn.microsoft.com/en-us/azure/search/search-what-is-azure-search)
+  - [Virtual Network](https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview)
+- Resources are deployed and used with security best practices in mind
+  - Azure Storage, AI Search, and OpenAI only supports identity authentication (no keys supported)
+  - Azure Storage and OpenAI service can only be accessed through the virtual network service endpoint (no public access)
+  - Azure Function App can only be accessed through a private endpoint (no public access)
+  - Required RBAC roles are assigned so services can communicate with each other with the least privilege
+- Python application that sets up Azure AI Search:
+  - Setup data store
+  - Setup skill set
+  - Setup index
+  - Setup indexer
+- Python application that runs in Azure Function App:
+  - Called by Azure AI Search when the indexer runs
+  - Receives a text content as input
+  - Sends the input to Azure OpenAI
+  - Sends the response to Azure AI Search
 
 ## Thinking Outside of the Box
+<FRANKLIN - TODO>
 
 This is a WHY and a WHAT
 
@@ -48,17 +62,55 @@ Describe ways users can customize and enahance the solution for use inside their
 
 ## Deploy the Solution
 
-Provide instructions on how to deploy the solutione:
+### Deploy Pre-requisites
+1. An [Azure subscription](https://azure.microsoft.com/en-us/free/)
+2. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest)
+3. Install [Bicep](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install)
+4. Install [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd)
 
-1. **Prerequisites**: List any requirements for using this solution (e.g., software, accounts).
-2. **Installation**: Step-by-step instructions for deploying the solution to Azure.
-3. **Post Deployment**: Include any instructions that the user may need to do after the resources have been deployed; for example, upload files to blob storage, create an ML or an AI Services project
+### Azd Deploy
+1. Clone this repository locally
+
+    `git clone https://github.com/Azure-Samples/ai-search-skills-in-a-box/`  
+2. Deploy resources
+
+    `az login`
+
+    `azd auth login`
+
+    `azd up`
+
+You will be prompted for:
+- environment name
+- azure subscription
+- azure region (we suggest using `eastus2`)
+
+### Setup AI Search
+This step is required to set up the AI Search service with:
+- Data store
+- Index
+- Skill set
+- Indexer
+
+1. Install requirements
+
+    `pip install -r aisearch/requirements.txt`
+2. Run the setup script
+
+    `python aisearch/setup.py`
+
+### Clean up
+To remove all resources created by this solution, run:
+    
+`azd down`
 
 ## Run the Solution
+<FRANKLIN - TODO>
 
 Include instructions on how they can run and test the solution
 
 ## Customize the Solution
+<FRANKLIN - TODO>
 
 Describe different ideas on how to enhance or customize for their use cases
 
@@ -69,17 +121,12 @@ This project welcomes contributions and suggestions. Most contributions require 
 When you submit a pull request, a CLA bot will automatically determine whether you need to provide a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repos using our CLA.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq) or contact <opencode@microsoft.com> with any additional questions or comments.
+
 ## Key Contacts & Contributors
 
-Highlight the main contacts for the project and acknowledge contributors. You can adapt the structure from AI-in-a-Box:
-
-| Contact | GitHub ID | Email |
-|---------|-----------|-------|
-| Your Name | @YourGitHub | your.email@example.com |
-
-## Acknowledgments
-
-If applicable, offer thanks to individuals, organizations, or projects that helped inspire or support your project.
+| Contact            | GitHub ID           | Email                    |
+|--------------------|---------------------|--------------------------|
+| Franklin Guimaraes | @franklinlindemebrg | fguimaraes@microsoft.com |
 
 ## License
 

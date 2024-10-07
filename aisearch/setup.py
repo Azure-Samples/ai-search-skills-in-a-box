@@ -49,6 +49,7 @@ class IndexManager:
         self.__setup_indexer()
 
     def __setup_skill_set(self):
+        print('starting skill set setup')
         skill_set = get_config('skill_set.json')
 
         set_custom_skill_url(skill_set['skills'], 'web_api_skill', web_api_endpoint)
@@ -65,8 +66,10 @@ class IndexManager:
             encryption_key=None
         )
         self.indexer_client.create_or_update_skillset(skill_set)
+        print('completed skill set setup')
 
     def __setup_data_source(self):
+        print('starting data source setup')
         datasource = SearchIndexerDataSourceConnection(
             name=data_source_name,
             description='',
@@ -79,8 +82,10 @@ class IndexManager:
             encryption_key=None,
         )
         self.indexer_client.create_or_update_data_source_connection(datasource)
+        print('completed data source setup')
 
     def __setup_index(self):
+        print('starting index setup')
         index_json = get_config('index.json')
         index = SearchIndex(
             name=index_name,
@@ -99,10 +104,11 @@ class IndexManager:
             vector_search=index_json.get('vectorSearch'),
             e_tag=index_json.get('eTag')
         )
-
         self.index_client.create_or_update_index(index)
+        print('completed index setup')
 
     def __setup_indexer(self):
+        print('starting indexer setup')
         indexer_json = get_config('indexer.json')
         indexer = SearchIndexer(
             name=indexer_name,
@@ -119,6 +125,7 @@ class IndexManager:
             encryption_key=indexer_json.get('encryptionKey'),
         )
         self.indexer_client.create_or_update_indexer(indexer)
+        print('completed indexer setup')
 
 
 def set_custom_skill_url(skills: dict, skill_name: str, url: str):
@@ -137,4 +144,6 @@ if __name__ == "__main__":
     credential = DefaultAzureCredential()
     manager = IndexManager(credential=credential)
 
+    print('starting ai search setup')
     manager.setup()
+    print('completed ai search setup')
