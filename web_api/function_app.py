@@ -19,11 +19,36 @@ client = AzureOpenAI(
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT_NAME')
-system_message = '''You are an assistant that needs to classify the user input into the following categories
-- Public
-- Private
-- Unknown
+system_message = '''Please classify the following text into one of the following categories: Politics, Sports, Entertainment, Technology, Business, Health.
+
+Examples:
+
+Politics:
+
+"The new healthcare reform bill has sparked debate in Congress."
+"A recent election has led to significant changes in the government."
+Sports:
+
+"The championship game ended with a thrilling last-minute goal."
+"The underdog team won the rugby final in a historic upset."
+Entertainment:
+
+"The latest blockbuster movie has broken box office records."
+"A popular music festival drew record crowds this weekend."
+Technology:
+
+"A breakthrough in AI research promises new advancements."
+"Quantum computing is set to revolutionize various industries."
+Business:
+
+"A major acquisition in the tech industry has been announced."
+"The retail giant launched an innovative sustainability initiative."
+Health:
+
+"A new vaccine shows promise in fighting infectious diseases."
+"Researchers have developed a new therapy for cancer treatment."
 '''
+
 
 @app.route(route="classify", methods=['POST'])
 def classify(req: func.HttpRequest) -> func.HttpResponse:
