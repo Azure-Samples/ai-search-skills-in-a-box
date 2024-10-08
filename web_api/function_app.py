@@ -23,30 +23,41 @@ system_message = '''Please classify the following text into one of the following
 
 Examples:
 
-Politics:
+Text: The new healthcare reform bill has sparked debate in Congress.
+Class: Politics
 
-"The new healthcare reform bill has sparked debate in Congress."
-"A recent election has led to significant changes in the government."
-Sports:
+Text: A recent election has led to significant changes in the government.
+Class: Politics
 
-"The championship game ended with a thrilling last-minute goal."
-"The underdog team won the rugby final in a historic upset."
-Entertainment:
+Text: The championship game ended with a thrilling last-minute goal.
+Class: Sports
 
-"The latest blockbuster movie has broken box office records."
-"A popular music festival drew record crowds this weekend."
-Technology:
+Text: The underdog team won the rugby final in a historic upset.
+Class: Sports
 
-"A breakthrough in AI research promises new advancements."
-"Quantum computing is set to revolutionize various industries."
-Business:
+Text: The latest blockbuster movie has broken box office records.
+Class: Entertainment
 
-"A major acquisition in the tech industry has been announced."
-"The retail giant launched an innovative sustainability initiative."
-Health:
+Text: A popular music festival drew record crowds this weekend.
+Class: Entertainment
 
-"A new vaccine shows promise in fighting infectious diseases."
-"Researchers have developed a new therapy for cancer treatment."
+Text: A breakthrough in AI research promises new advancements.
+Class: Technology
+
+Text: Quantum computing is set to revolutionize various industries.
+Class: Technology
+
+Text: A major acquisition in the tech industry has been announced.
+Class: Business
+
+Text: The retail giant launched an innovative sustainability initiative.
+Class: Business
+
+Text: A new vaccine shows promise in fighting infectious diseases.
+Class: Health
+
+Text: Researchers have developed a new therapy for cancer treatment.
+Class: Health
 '''
 
 

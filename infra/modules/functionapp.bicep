@@ -3,7 +3,7 @@ param environmentName string
 param servicePlanName string
 param appName string
 param storageName string
-param aiServicesName string
+param openaiName string
 param deployContainerName string
 param serviceName string
 param subnetId string
@@ -110,19 +110,19 @@ resource storageContributorAccess 'Microsoft.Authorization/roleAssignments@2022-
   }
 }
 
-resource aiServices 'Microsoft.CognitiveServices/accounts@2023-05-01' existing = {
-  name: aiServicesName
+resource openai 'Microsoft.CognitiveServices/accounts@2023-05-01' existing = {
+  name: openaiName
 }
 
-resource openaiServiceUserRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+resource openaiUserRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   name: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
 }
 
-resource openaiServiceRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(functionApp.id, aiServices.id, openaiServiceUserRole.id)
-  scope: aiServices
+resource openaiRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(functionApp.id, openai.id, openaiUserRole.id)
+  scope: openai
   properties: {
-    roleDefinitionId: openaiServiceUserRole.id
+    roleDefinitionId: openaiUserRole.id
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }

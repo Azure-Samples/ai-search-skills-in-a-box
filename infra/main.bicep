@@ -17,8 +17,8 @@ param searchName string = ''
 @description('Name of the Storage Account. Automatically generated if left blank')
 @maxLength(24)
 param storageName string = ''
-@description('AI Services resource name')
-param aiServicesName string = ''
+@description('Open AI resource name')
+param openaiName string = ''
 
 @description('User IP address to allow for SQL Server connection')
 param userIpAddress string = ''
@@ -32,7 +32,7 @@ var names = {
   search: !empty(searchName) ? searchName : '${abbrs.searchSearchServices}${environmentName}-${uniqueSuffix}'
   searchSkill: !empty(searchName) ? '${searchName}-skill' : '${abbrs.searchSearchServices}${environmentName}-${uniqueSuffix}-skill'
   searchAppPrivateLinkName: '${abbrs.networkPrivateLinkServices}${environmentName}-${uniqueSuffix}'
-  aiServicesName: !empty(aiServicesName) ? aiServicesName : '${abbrs.cognitiveServicesAzureAI}${environmentName}-${uniqueSuffix}'
+  openaiName: !empty(openaiName) ? openaiName : '${abbrs.cognitiveServicesOpenAI}${environmentName}-${uniqueSuffix}'
   vnetName: '${abbrs.networkVirtualNetworks}${environmentName}-${uniqueSuffix}'
   appName: '${abbrs.webSitesAppService}${environmentName}-${uniqueSuffix}' 
   servicePlanName: '${abbrs.webServerFarms}${environmentName}-${uniqueSuffix}' 
@@ -61,7 +61,7 @@ module m_vnet 'modules/vnet.bicep' = {
   }
 }
 
-module m_aiservices 'modules/aiservices.bicep' = {
+module m_openai 'modules/openai.bicep' = {
   name: 'deploy_openai'
   scope: resourceGroup
   params: {
@@ -69,7 +69,7 @@ module m_aiservices 'modules/aiservices.bicep' = {
     userPrincipalId: userPrincipalId
     userIpAddress: userIpAddress
     subnetId: m_vnet.outputs.subnetId
-    aiServicesName: names.aiServicesName
+    openaiName: names.openaiName
     tags: tags
   }
 }
@@ -98,7 +98,7 @@ module m_web_api 'modules/functionapp.bicep' = {
     servicePlanName: names.servicePlanName
     appName: names.appName
     storageName: m_storage.outputs.storageName
-    aiServicesName: m_aiservices.outputs.aiServicesName
+    openaiName: m_openai.outputs.openaiName
     deployContainerName: deployContainer
     serviceName: serviceName
     subnetId: m_vnet.outputs.subnetId
@@ -127,8 +127,8 @@ output STORAGE_NAME string = m_storage.outputs.storageName
 output SEARCH_SERVICE_NAME string = m_search.outputs.searchName
 output SEARCH_DATA_SOURCE_CONNECTION string = 'ResourceId=${m_storage.outputs.storageId};'
 output SEARCH_DATA_SOURCE_CONTAINER string = searchContainer
-output AZURE_OPENAI_CHAT_DEPLOYMENT_NAME string = m_aiservices.outputs.deploymentName
-output AZURE_OPENAI_ENDPOINT string = m_aiservices.outputs.endpoint
+output AZURE_OPENAI_CHAT_DEPLOYMENT_NAME string = m_openai.outputs.deploymentName
+output AZURE_OPENAI_ENDPOINT string = m_openai.outputs.endpoint
 output WEB_API_URL string = m_web_api.outputs.appUrl
 output WEB_API_NAME string = m_web_api.outputs.appName
 output SEARCH_APP_SHARED_PRIVATE_LINK_NAME string = m_search.outputs.searchAppSharedPrivateLinkName

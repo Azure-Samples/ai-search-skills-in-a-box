@@ -1,20 +1,20 @@
 param location string
 param userPrincipalId string
 param userIpAddress string
-param aiServicesName string
+param openaiName string
 param subnetId string
 param tags object = {}
 
-resource aiServices 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
-  name: aiServicesName
+resource openai 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
+  name: openaiName
   location: location
   tags: tags
   sku: {
     name: 'S0'
   }
-  kind: 'AIServices'
+  kind: 'OpenAI'
   properties: {
-    customSubDomainName: aiServicesName
+    customSubDomainName: openaiName
     disableLocalAuth: true
     publicNetworkAccess: (userIpAddress != '') ? 'Enabled' : 'Disabled'
     networkAcls:  {
@@ -34,7 +34,7 @@ resource aiServices 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
 }
 
 resource gptDeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05-01' = {
-  parent: aiServices
+  parent: openai
   name: 'gpt-4o'
   properties: {
     model: {
@@ -49,20 +49,20 @@ resource gptDeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05
   }
 }
 
-resource openaiServiceContributorRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+resource openaiContributorRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   name: 'a001fd3d-188f-4b5d-821b-7da978bf7442'
 }
 
-resource openaiServiceRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(userPrincipalId, aiServices.id, openaiServiceContributorRole.id)
-  scope: aiServices
+resource openaiRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(userPrincipalId, openai.id, openaiContributorRole.id)
+  scope: openai
   properties: {
-    roleDefinitionId: openaiServiceContributorRole.id
+    roleDefinitionId: openaiContributorRole.id
     principalId: userPrincipalId
     principalType: 'User'
   }
 }
 
-output aiServicesName string = aiServices.name
-output endpoint string = aiServices.properties.endpoint
+output openaiName string = openai.name
+output endpoint string = openai.properties.endpoint
 output deploymentName string = gptDeployment.name
