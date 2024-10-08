@@ -19,9 +19,15 @@ client = AzureOpenAI(
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT_NAME')
-system_message = '''Please classify the following text into one of the following categories: Politics, Sports, Entertainment, Technology, Business, Health.
+system_message = '''Please classify the text into one of the following categories: 
+- Politics
+- Sports 
+- Entertainment
+- Technology
+- Business
+- Health
 
-Examples:
+Below are some example texts for classification:
 
 Text: The new healthcare reform bill has sparked debate in Congress.
 Class: Politics
@@ -58,6 +64,8 @@ Class: Health
 
 Text: Researchers have developed a new therapy for cancer treatment.
 Class: Health
+
+Below the text you should classify:
 '''
 
 
