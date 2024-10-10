@@ -27,7 +27,7 @@ system_message = '''Please classify the text into one of the following categorie
 - Business
 - Health
 
-Below are some example texts for classification:
+Below are some example texts for classification. You should return only the class value.
 
 Text: The new healthcare reform bill has sparked debate in Congress.
 Class: Politics
