@@ -47,6 +47,7 @@ This solution can be adapted for many other use cases. Here are some ideas:
 - Update the Azure Function App to perform other actions and return more metadata to be indexed
 - Update the skill set to include additional skills
   - You can find the available skills [here](https://learn.microsoft.com/en-us/azure/search/cognitive-search-predefined-skills#azure-ai-resource-skills)
+- Integrate with one of the skills available in [azure-search-power-skills](https://github.com/Azure-Samples/azure-search-power-skills) repository
 - Integrate vector search and semantic search capabilities
 
 ## Deploy the Solution
