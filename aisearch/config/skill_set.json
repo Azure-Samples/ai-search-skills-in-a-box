@@ -1,0 +1,72 @@
+{
+    "skills":
+    [
+        {
+            "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+            "textSplitMode": "pages",
+            "maximumPageLength": 4000,
+            "defaultLanguageCode": "en",
+            "context": "/document",
+            "inputs": [
+                {
+                    "name": "text",
+                    "source": "/document/content"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "textItems",
+                    "targetName": "pages"
+                }
+            ]
+        },
+        {        
+            "@odata.type": "#Microsoft.Skills.Custom.WebApiSkill",        
+            "name": "web_api_skill",
+            "context": "/document/pages/*",
+            "inputs": [           
+                {            
+                    "name": "text",            
+                    "source": "/document/pages/*"
+                }         
+            ],        
+            "outputs": [           
+                {            
+                    "name": "classification",            
+                    "targetName": "classification"
+                }         
+            ]       
+        }
+    ],
+    "indexProjections": {
+        "selectors": [
+            {
+                "parentKeyFieldName": "parent_id",
+                "sourceContext": "/document/pages/*",
+                "mappings": [
+                    {
+                        "name": "title",
+                        "source": "/document/title",
+                        "sourceContext": null,
+                        "inputs": []
+                    },
+                    {
+                        "name": "chunk",
+                        "source": "/document/pages/*",
+                        "sourceContext": null,
+                        "inputs": []
+                    },
+                    {
+                        "name": "classification",
+                        "source": "/document/pages/*/classification",
+                        "sourceContext": null,
+                        "inputs": []
+                    }
+                ]
+            }
+        ],
+        "parameters": {
+            "projectionMode": "skipIndexingParentDocuments"
+        }
+    }
+}

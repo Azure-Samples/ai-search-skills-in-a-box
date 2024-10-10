@@ -1,0 +1,19 @@
+{
+    "fieldMappings": [
+        {
+            "sourceFieldName": "metadata_storage_name",
+            "targetFieldName": "title"
+        }
+    ],
+    "parameters": {
+    "batchSize": 1,
+    "maxFailedItems":-1,
+    "maxFailedItemsPerBatch":-1,
+    "configuration":
+        {
+            "dataToExtract": "contentAndMetadata",
+            "imageAction": "generateNormalizedImages",
+            "executionEnvironment": "private"
+        }
+    }
+}
