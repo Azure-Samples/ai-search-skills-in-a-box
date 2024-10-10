@@ -139,18 +139,18 @@ In order to do that you'll need to:
    - You need to modify the `functionapp/functionapp.py` file. Update the `data` dictionary to include the new fields.
       ```json
         'data': {
-           'classification': response.choices[0].message.content
+          'classification': response.choices[0].message.content
         }
-       ```
+      ```
 3. Update the skill set to map the new fields (from the Azure Function App response to the index field). For example:
     ```json
-    {
+      {
         "name": "classification",
         "source": "/document/pages/*/classification",
         "sourceContext": null,
         "inputs": []
-    }
-```
+      }
+    ```
 ## How to Contribute
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit <https://cla.opensource.microsoft.com>
