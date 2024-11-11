@@ -169,6 +169,14 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general). Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship. Any use of third-party trademarks or logos are subject to those third-party's policies.
 
+## FAR
+
+1. I can't delete the AI Search resource. How to fix it?
+    - It might be necessary to manually delete the shared private link first. To do that, go to the Azure Portal, navigate to the AI Search resource, then go to Settings -> Networking, click on the `Shared private access` tab, and delete the shared private link.
+
+2. When I try to create an AI Search resource with a different SKU (other than S2) the solution does not work. How to fix it?
+    - The solution requires AI Search to have a private link in order to connect to the Azure Function App. The SKU S2 is the only one that supports private links. If you want to use a different SKU, you need to modify the solution to use a different way to connect to the Azure Function App. More information can be found [here](https://learn.microsoft.com/en-us/azure/search/search-sku-tier#feature-availability-by-tier).
+
 ---
 
 This project is part of the AI-in-a-Box series, aimed at providing the technical community with tools and accelerators to implement AI/ML solutions efficiently and effectively.
